@@ -54,7 +54,11 @@ async function run() {
 			res.send(result);
 		});
 
-        
+        // get popular classes
+        app.get("/popularClasses", async (req, res) => {
+            const result = await classCollection.find().limit(15).toArray();
+            res.send(result);
+        })
 
 		// Send a ping to confirm a successful connection
 		await client.db("admin").command({ ping: 1 });
