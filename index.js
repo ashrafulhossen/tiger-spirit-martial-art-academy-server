@@ -169,7 +169,14 @@ async function run() {
 		
 
 		
-		
+		// delete students selected class to enrolled class
+		app.delete("/student/:user/delete", async (req, res) => {
+			const classId = req.query.class;
+			const filter = { _id: new ObjectId(classId) };
+			const result = await selectedClassCollection.deleteOne(filter);
+			console.log(result);
+			res.send(result);
+		});
 
 		// approved class
 		app.put("/selectedClass/:classId/approved", async (req, res) => {
