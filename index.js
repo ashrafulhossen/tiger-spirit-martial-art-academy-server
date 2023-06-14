@@ -166,7 +166,13 @@ async function run() {
 
 		
 
-		
+		// get students enrolled class
+		app.get("/student/:uid/enrolledClass", async (req, res) => {
+			const studentUid = req.params.uid;
+			const filter = { studentUid, isPaid: true };
+			const result = await selectedClassCollection.find(filter).toArray();
+			res.send(result);
+		});
 
 		// update students selected class to enrolled class
 		app.put("/student/:user/enrollment", async (req, res) => {
@@ -180,7 +186,7 @@ async function run() {
 			res.send(result);
 		});
 
-		// delete students selected class
+		// delete students selected class to enrolled class
 		app.delete("/student/:user/delete", async (req, res) => {
 			const classId = req.query.class;
 			const filter = { _id: new ObjectId(classId) };
