@@ -111,7 +111,18 @@ async function run() {
 
 		
 
-		
+		// make user as admin
+		app.put("/users/:userUid/makeAdmin", async (req, res) => {
+			const userUid = req.params.userUid;
+			const filter = { uid: userUid };
+			const update = {
+				$set: {
+					role: "admin"
+				}
+			};
+			const result = await userCollection.updateOne(filter, update);
+			res.send(result);
+		});
 
 		// get all instructors
 		app.get("/instructors", async (req, res) => {
