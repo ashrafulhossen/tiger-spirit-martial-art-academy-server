@@ -109,7 +109,18 @@ async function run() {
 			res.send(result);
 		});
 
-		
+		// make user as instructor
+		app.put("/users/:userUid/makeInstructor", async (req, res) => {
+			const userUid = req.params.userUid;
+			const filter = { uid: userUid };
+			const update = {
+				$set: {
+					role: "instructor"
+				}
+			};
+			const result = await userCollection.updateOne(filter, update);
+			res.send(result);
+		});
 
 		// make user as admin
 		app.put("/users/:userUid/makeAdmin", async (req, res) => {
