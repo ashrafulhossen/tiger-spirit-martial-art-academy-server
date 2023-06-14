@@ -164,7 +164,13 @@ async function run() {
 
 		
 
-		
+		// get students selected class
+		app.get("/student/:uid/selectedClass", async (req, res) => {
+			const studentUid = req.params.uid;
+			const filter = { studentUid, isPaid: false };
+			const result = await selectedClassCollection.find(filter).toArray();
+			res.send(result);
+		});
 
 		// get students enrolled class
 		app.get("/student/:uid/enrolledClass", async (req, res) => {
