@@ -171,7 +171,19 @@ async function run() {
 		
 		
 
-		
+		// approved class
+		app.put("/selectedClass/:classId/approved", async (req, res) => {
+			const classId = req.params.classId;
+			const filter = { _id: new ObjectId(classId) };
+			const update = {
+				$set: {
+					status: "approved"
+				}
+			};
+			const result = await classCollection.updateOne(filter, update);
+			console.log(result);
+			res.send(result);
+		});
 
 		// deny class
 		app.put("/selectedClass/:classId/denied", async (req, res) => {
