@@ -125,7 +125,13 @@ async function run() {
 			res.send(result);
 		});
 
-		
+		// get all classes based on instructor
+		app.get("/classes/:instructorUid", async (req, res) => {
+			const instructorUid = req.params.instructorUid;
+			const filter = { "instructor.uid": instructorUid };
+			const result = await classCollection.find(filter).toArray();
+			res.send(result);
+		});
 
 		// get all approved classes
 		app.get("/classes", async (req, res) => {
