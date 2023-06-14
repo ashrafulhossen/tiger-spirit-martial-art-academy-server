@@ -162,7 +162,38 @@ async function run() {
 			res.send(result);
 		});
 
-		
+		// post students classes
+		app.post("/selectedClass/:selectedClass", async (req, res) => {
+			const selectedClassId = req.params.selectedClass;
+			const { classUpdatableData, selectedClassObj } = req.body;
+			const filter = { _id: new ObjectId(selectedClassId) };
+			const updateSeats = {
+				$set: {
+					availableSeats: classUpdatableData.availableSeats,
+					enroll: classUpdatableData.enroll
+				}
+			};
+			const isClassAlreadySelected =
+				await selectedClassCollection.findOne({
+					name: selectedClassObj.name,
+					studentUid: selectedClassObj.studentUid
+				});
+			if (isClassAlreadySelected) {
+				res.send({ status: "You are already selected this class" });
+			} else {
+				const updateSeatsResult = await classCollection.updateOne(
+					filter,
+					updateSeats
+				);
+				const addSelectedClassResult =
+					await selectedClassCollection.insertOne(selectedClassObj);
+				const result = {
+					modifiedCount: updateSeatsResult.modifiedCount,
+					insertedId: addSelectedClassResult.insertedId
+				};
+				res.send(result);
+			}
+		});
 
 		// get students selected class
 		app.get("/student/:uid/selectedClass", async (req, res) => {
