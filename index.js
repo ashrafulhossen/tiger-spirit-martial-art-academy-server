@@ -155,16 +155,22 @@ async function run() {
 			res.send(result);
 		});
 
-		// get all approved classes
 		app.get("/classes", async (req, res) => {
-			const query = { approved: true };
-			const result = await classCollection.find(query).toArray();
+			const result = await classCollection.find().toArray();
+			res.send(result);
+		});
+
+		// get all approved classes
+		app.get("/approvedClasses", async (req, res) => {
+			const result = await classCollection
+				.find({ status: "approved" })
+				.toArray();
 			res.send(result);
 		});
 
 		// get single class
 		app.get("/classes/:classId", async (req, res) => {
-			const classId = req.params.classId;
+			const instructorUid = req.params.classId;
 			console.log(classId);
 			const filter = { _id: new ObjectId(classId) };
 			const result = await classCollection.findOne(filter);
@@ -180,9 +186,17 @@ async function run() {
 
 		// get popular classes
 		app.get("/popularClasses", async (req, res) => {
-			const result = await classCollection.find().limit(10).toArray();
+			const result = await classCollection.find().limit(6).toArray();
 			res.send(result);
 		});
+
+		// get students class
+		app.get("/selectedClass/:selectedClass", async (req, res) => {
+			const _id = req.params.selectedClass;
+			const filter = {_id: new ObjectId(_id)};
+			const result = await selectedClassCollection.findOne(filter);
+			res.send(result);
+		})
 
 		// post students classes
 		app.post("/selectedClass/:selectedClass", async (req, res) => {
@@ -280,6 +294,34 @@ async function run() {
 			const result = await classCollection.updateOne(filter, update);
 			console.log(result);
 			res.send(result);
+		});
+
+		// Payment System
+		app.post("/create-payment-intent", verifingJWT, async (req, res) => {
+			const { price } = req.body;
+			const amount = parseInt(price * 100);
+			const paymentIntent = await stripe.paymentIntents.create({
+				amount: amount,
+				currency: "usd",
+				payment_method_types: ["card"]
+			});
+
+			res.send({
+				clientSecret: paymentIntent.client_secret
+			});
+		});
+
+		// payment related api
+		app.post("/payments", verifingJWT, async (req, res) => {
+			const payment = req.body;
+			const insertResult = await paymentCollection.insertOne(payment);
+
+			const query = {
+				_id: { $in: payment.cartItems.map((id) => new ObjectId(id)) }
+			};
+			const deleteResult = await cartCollection.deleteMany(query);
+
+			res.send({ insertResult, deleteResult });
 		});
 
 		// Send a ping to confirm a successful connection
